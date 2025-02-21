@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# ✅ Konfigurasi halaman utama tanpa sidebar
+# ✅ Konfigurasi halaman tanpa sidebar
 st.set_page_config(page_title="Pantun Warga Emas", layout="wide")
 
 # ✅ CSS untuk sembunyikan sidebar sepenuhnya
@@ -18,28 +18,30 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ✅ Path ke fail CSV & fail muat turun
+# ✅ Path ke fail
 csv_path = "data/60_Pantun_Warga_Emas.csv"
 pdf_path = "data/60_Pantun_Warga_Emas_Final.pdf"
 docx_path = "data/60_Pantun_Warga_Emas_Final.docx"
 
-# ✅ Fungsi untuk memuatkan data pantun
+# ✅ Semak kewujudan fail secara automatik
+pantun_available = os.path.exists(csv_path)
+pdf_available = os.path.exists(pdf_path)
+docx_available = os.path.exists(docx_path)
+
+# ✅ Fungsi untuk memuatkan pantun hanya jika fail ada
 @st.cache_data
 def load_pantun():
-    if os.path.exists(csv_path):
-        df = pd.read_csv(csv_path, encoding='utf-8')
-        return df
-    else:
-        return None
+    if pantun_available:
+        return pd.read_csv(csv_path, encoding='utf-8')
+    return None
 
-# ✅ Muatkan DataFrame pantun
 df_pantun = load_pantun()
 
-# ✅ Menu navigasi utama (Tiada sidebar)
+# ✅ Menu Navigasi
 st.markdown("<h1 style='text-align: center;'>📖 Pantun Warga Emas</h1>", unsafe_allow_html=True)
 menu = st.radio("📌 Pilih Menu:", ["App", "Carian Pantun", "Muat Turun Buku"], horizontal=True)
 
-# ✅ Halaman APP (Halaman utama)
+# ✅ Halaman APP
 if menu == "App":
     st.write("Inisiatif untuk mendokumentasikan dan menyebarkan hikmah dalam bentuk pantun.")
     st.markdown("""
@@ -49,12 +51,17 @@ if menu == "App":
     - 📥 **Muat turun koleksi pantun dalam format PDF & DOCX**
     """)
 
-# ✅ Halaman Carian Pantun (Pantun hanya dipaparkan di sini)
+# ✅ Halaman Carian Pantun
 elif menu == "Carian Pantun":
     st.markdown("<h2 style='text-align: center;'>🔍 Carian Pantun</h2>", unsafe_allow_html=True)
 
-    if df_pantun is None:
-        st.error("❌ Fail pantun tidak ditemui. Sila pastikan fail telah dimuat naik dengan betul.")
+    if not pantun_available:
+        st.error("❌ Fail pantun tidak ditemui. Admin sila muat naik fail CSV.")
+        uploaded_file = st.file_uploader("📂 Muat Naik Fail CSV Pantun", type=["csv"])
+        if uploaded_file is not None:
+            with open(csv_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            st.success("✅ Fail CSV pantun berjaya dimuat naik! Sila refresh halaman.")
     else:
         pilihan_carian = st.radio("Bagaimana anda mahu cari pantun?", ["Tema", "Jenis", "Situasi Penggunaan", "Kata Kunci"], horizontal=True)
 
@@ -67,7 +74,7 @@ elif menu == "Carian Pantun":
         elif pilihan_carian == "Situasi Penggunaan":
             pilihan = st.selectbox("🎯 Pilih Situasi Penggunaan:", ["Semua"] + sorted(df_pantun["Situasi Penggunaan"].unique()))
             filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Situasi Penggunaan"] == pilihan]
-        else:  # Kata kunci
+        else:
             search_query = st.text_input("🔎 Masukkan kata kunci pantun:")
             filtered_pantun = df_pantun[
                 df_pantun.apply(lambda row: search_query.lower() in row.astype(str).str.lower().to_string(), axis=1)
@@ -94,18 +101,21 @@ elif menu == "Muat Turun Buku":
     st.markdown("<h2 style='text-align: center;'>📥 Muat Turun Buku</h2>", unsafe_allow_html=True)
     st.write("Muat turun buku pantun dalam format PDF atau DOCX.")
 
-    # 🔹 Semak kewujudan fail sebelum membenarkan muat turun
-    if os.path.exists(pdf_path):
-        with open(pdf_path, "rb") as file_pdf:
-            st.download_button("📄 Muat Turun PDF", file_pdf, file_name="60_Pantun_Warga_Emas.pdf", mime="application/pdf")
-    else:
-        st.error("❌ Fail PDF tidak ditemui. Sila semak semula.")
+    if not pdf_available:
+        st.error("❌ Fail PDF tidak ditemui. Admin sila muat naik fail PDF.")
+        uploaded_pdf = st.file_uploader("📂 Muat Naik Fail PDF", type=["pdf"])
+        if uploaded_pdf is not None:
+            with open(pdf_path, "wb") as f:
+                f.write(uploaded_pdf.getbuffer())
+            st.success("✅ Fail PDF berjaya dimuat naik! Sila refresh halaman.")
 
-    if os.path.exists(docx_path):
-        with open(docx_path, "rb") as file_docx:
-            st.download_button("📜 Muat Turun DOCX", file_docx, file_name="60_Pantun_Warga_Emas.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    else:
-        st.error("❌ Fail DOCX tidak ditemui. Sila semak semula.")
+    if not docx_available:
+        st.error("❌ Fail DOCX tidak ditemui. Admin sila muat naik fail DOCX.")
+        uploaded_docx = st.file_uploader("📂 Muat Naik Fail DOCX", type=["docx"])
+        if uploaded_docx is not None:
+            with open(docx_path, "wb") as f:
+                f.write(uploaded_docx.getbuffer())
+            st.success("✅ Fail DOCX berjaya dimuat naik! Sila refresh halaman.")
 
 # ✅ Footer
 st.markdown("""
