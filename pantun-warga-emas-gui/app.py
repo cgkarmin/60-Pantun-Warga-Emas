@@ -23,9 +23,9 @@ st.markdown(
 )
 
 # **🔹 Cari fail CSV dalam direktori yang betul**
-csv_filename = "data/60_Pantun_Warga_Emas.csv"
+csv_filename = "pantun-warga-emas-gui/data/60_Pantun_Warga_Emas.csv"
 if not os.path.exists(csv_filename):
-    st.error("❌ Fail pantun tidak ditemui! Pastikan ia berada dalam folder 'data/'.")
+    st.error("❌ Fail pantun tidak ditemui! Pastikan ia berada dalam folder 'pantun-warga-emas-gui/data/'.")
     st.stop()
 
 # **🔹 Muatkan data CSV**
