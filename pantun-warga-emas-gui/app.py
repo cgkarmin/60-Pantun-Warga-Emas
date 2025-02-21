@@ -17,6 +17,11 @@ st.markdown(
         section[data-testid="stSidebar"] {
             display: none !important;
         }
+        /* Pastikan teks sentiasa hitam untuk mod gelap & terang */
+        body, .stApp {
+            color: black !important;
+            background-color: white !important;
+        }
     </style>
     """,
     unsafe_allow_html=True
@@ -32,7 +37,7 @@ if not os.path.exists(csv_filename):
 df_pantun = pd.read_csv(csv_filename)
 
 # **🔹 MENU UTAMA**
-st.markdown("<h1 style='text-align: center;'>📜 Pantun Warga Emas</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black;'>📜 Pantun Warga Emas</h1>", unsafe_allow_html=True)
 
 menu = st.radio(
     "Pilih Menu:",
@@ -44,7 +49,7 @@ st.markdown("---")
 
 # **🔹 HALAMAN UTAMA (APP)**
 if menu == "App":
-    st.markdown("<h2>📖 Pantun Warga Emas</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: black;'>📖 Pantun Warga Emas</h2>", unsafe_allow_html=True)
     st.markdown("""
     🏠 **Selamat Datang ke Aplikasi Pantun Warga Emas!**  
     Gunakan aplikasi ini untuk mencari dan memahami 60 pantun penuh hikmah, nasihat, dan warisan budaya.
@@ -52,7 +57,7 @@ if menu == "App":
 
 # **🔎 CARIAN PANTUN**
 elif menu == "Carian Pantun":
-    st.markdown("<h2>🔍 Cari Pantun Warga Emas</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: black;'>🔍 Cari Pantun Warga Emas</h2>", unsafe_allow_html=True)
     pilihan_carian = st.radio(
         "Bagaimana anda mahu cari pantun?",
         ["Tema", "Jenis", "Situasi Penggunaan"],
@@ -74,9 +79,9 @@ elif menu == "Carian Pantun":
         pantun_rangkap = row['Pantun'].replace("\n", "<br>")
         st.markdown(
             f"""
-            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 10px;">
-            <h3>📖 {row['Tema']}</h3>
-            <p style='font-size: 18px; font-style: italic;'>{pantun_rangkap}</p>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 10px; color: black;">
+            <h3 style='color: black;'>📖 {row['Tema']}</h3>
+            <p style='font-size: 18px; font-style: italic; color: black;'>{pantun_rangkap}</p>
             <p><b>📌 Makna:</b> {row['Makna']}</p>
             <p><b>🏷 Jenis:</b> {row['Jenis']} | <b>🎯 Situasi Penggunaan:</b> {row['Situasi Penggunaan']}</p>
             <p><b>🌿 Konteks Alam:</b> {row['Konteks Alam']}</p>
@@ -93,7 +98,7 @@ elif menu == "Carian Pantun":
 st.markdown(
     """
     <hr>
-    <p style='text-align: center; font-size: 14px;'>
+    <p style='text-align: center; font-size: 14px; color: black;'>
     © 2023-2025 Carian Pantun Warga Emas. v1. 2008-2025. Sebuah carian pantun berguna yang boleh digunakan dalam acara, tempat dan majlis.
     </p>
     """,
