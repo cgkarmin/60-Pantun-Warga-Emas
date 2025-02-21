@@ -5,10 +5,11 @@ import os
 # Tetapan halaman utama
 st.set_page_config(page_title="Pantun Warga Emas", layout="wide", initial_sidebar_state="collapsed")
 
-# Path fail
-csv_filename = "data/60_Pantun_Warga_Emas.csv"
-pdf_filename = "data/60_Pantun_Warga_Emas_Final.pdf"
-docx_filename = "data/60_Pantun_Warga_Emas_Final.docx"
+# Path fail (Gunakan path relatif yang sesuai untuk deployment)
+data_folder = os.path.join(os.getcwd(), "data")
+csv_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas.csv")
+pdf_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas_Final.pdf")
+docx_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas_Final.docx")
 
 # Periksa kewujudan fail
 pantun_loaded = os.path.exists(csv_filename)
