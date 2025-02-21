@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+# Buang sidebar
+st.set_page_config(page_title="Pantun Warga Emas", layout="wide", initial_sidebar_state="collapsed")
+
 # Muatkan data pantun
 csv_filename = "data/60_Pantun_Warga_Emas.csv"
 
@@ -9,13 +12,10 @@ try:
 except FileNotFoundError:
     df_pantun = None
 
-# Konfigurasi halaman utama
-st.set_page_config(page_title="Pantun Warga Emas", layout="wide")
-
 # Header utama
 st.markdown("<h1 style='text-align: center;'>📖 Pantun Warga Emas</h1>", unsafe_allow_html=True)
 
-# Menu pilihan
+# Menu utama
 menu = st.radio("📌 Pilih menu:", ["App", "Carian Pantun", "Muat Turun Buku"], horizontal=True)
 
 if menu == "App":
@@ -24,7 +24,7 @@ if menu == "App":
 
 elif menu == "Carian Pantun":
     st.subheader("🔍 Carian Pantun Warga Emas")
-    
+
     if df_pantun is not None:
         search_keyword = st.text_input("Masukkan kata kunci untuk mencari pantun:")
         if search_keyword:
