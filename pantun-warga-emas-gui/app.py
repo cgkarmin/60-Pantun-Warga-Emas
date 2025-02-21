@@ -20,7 +20,7 @@ st.markdown(
         /* Pastikan teks sentiasa hitam untuk mod gelap & terang */
         body, .stApp {
             color: black !important;
-            background: linear-gradient(to right, #d9f99d, #fef9c3) !important;
+            background: linear-gradient(to right, #166534, #2a9d8f) !important;
         }
     </style>
     """,
