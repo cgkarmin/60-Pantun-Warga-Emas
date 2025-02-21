@@ -59,6 +59,7 @@ if menu == "App":
 elif menu == "Carian Pantun":
     st.markdown("<h2 style='color: green;'>🔍 Cari Pantun Warga Emas</h2>", unsafe_allow_html=True)
     pilihan_carian = st.radio(
+    "<span style='color: green;'>Bagaimana anda mahu cari pantun?</span>",
         "Bagaimana anda mahu cari pantun?",
         ["Tema", "Jenis", "Situasi Penggunaan"],
         horizontal=True
