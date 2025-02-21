@@ -10,7 +10,7 @@ st.set_page_config(
     menu_items={"Get Help": None, "Report a bug": None, "About": None}
 )
 
-# **🔹 Sembunyikan sidebar sepenuhnya **
+# **🔹 Sembunyikan sidebar sepenuhnya dan tukar warna latar belakang**
 st.markdown(
     """
     <style>
@@ -20,7 +20,7 @@ st.markdown(
         /* Pastikan teks sentiasa hitam untuk mod gelap & terang */
         body, .stApp {
             color: black !important;
-            background-color: white !important;
+            background: linear-gradient(to right, #d9f99d, #fef9c3) !important;
         }
     </style>
     """,
@@ -57,22 +57,21 @@ if menu == "App":
 
 # **🔎 CARIAN PANTUN**
 elif menu == "Carian Pantun":
-    st.markdown("<h2 style='color: green;'>🔍 Cari Pantun Warga Emas</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: black;'>🔍 Cari Pantun Warga Emas</h2>", unsafe_allow_html=True)
     pilihan_carian = st.radio(
-    "<span style='color: green;'>Bagaimana anda mahu cari pantun?</span>",
         "Bagaimana anda mahu cari pantun?",
         ["Tema", "Jenis", "Situasi Penggunaan"],
         horizontal=True
     )
 
     if pilihan_carian == "Tema":
-        pilihan = st.selectbox("📌 <span style='color: green;'>Pilih Tema:</span>", ["Semua"] + sorted(df_pantun["Tema"].dropna().unique()))
+        pilihan = st.selectbox("📌 Pilih Tema:", ["Semua"] + sorted(df_pantun["Tema"].dropna().unique()))
         filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Tema"] == pilihan]
     elif pilihan_carian == "Jenis":
-        pilihan = st.selectbox("🏷 <span style='color: green;'>Pilih Jenis Pantun:</span>", ["Semua"] + sorted(df_pantun["Jenis"].dropna().unique()))
+        pilihan = st.selectbox("🏷 Pilih Jenis Pantun:", ["Semua"] + sorted(df_pantun["Jenis"].dropna().unique()))
         filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Jenis"] == pilihan]
     elif pilihan_carian == "Situasi Penggunaan":
-        pilihan = st.selectbox("🎯 <span style='color: green;'>Pilih Situasi Penggunaan:</span>", ["Semua"] + sorted(df_pantun["Situasi Penggunaan"].dropna().unique()))
+        pilihan = st.selectbox("🎯 Pilih Situasi Penggunaan:", ["Semua"] + sorted(df_pantun["Situasi Penggunaan"].dropna().unique()))
         filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Situasi Penggunaan"] == pilihan]
 
     # **Paparkan Hasil Carian**
