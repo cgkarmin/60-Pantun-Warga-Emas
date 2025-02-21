@@ -1,136 +1,62 @@
-import os
 import streamlit as st
 import pandas as pd
+import random
 
-# ✅ Konfigurasi halaman Streamlit
-st.set_page_config(
-    page_title="Pantun Warga Emas",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# ✅ Konfigurasi halaman
+st.set_page_config(page_title="Paparan Pantun", layout="wide")
 
-# ✅ Pastikan fail CSV boleh dibaca di laptop & Streamlit Cloud
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-csv_filename = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas.csv")
+# ✅ Path ke fail CSV dalam Streamlit Cloud
+csv_path = "data/60_Pantun_Warga_Emas.csv"
 
-if not os.path.exists(csv_filename):
-    st.error(f"❌ Fail CSV tidak ditemui! Pastikan ia berada dalam folder `data/`. Path: {csv_filename}")
-    st.stop()
+# ✅ Fungsi untuk memuatkan data pantun
+@st.cache_data
+def load_pantun():
+    try:
+        df = pd.read_csv(csv_path, encoding='utf-8')
+        st.success(f"✅ Data pantun dimuat dari: `{csv_path}`")
+        return df
+    except FileNotFoundError:
+        st.error("❌ Fail pantun tidak ditemui. Sila pastikan fail telah dimuat naik dengan betul.")
+        return pd.DataFrame()
 
-# ✅ Baca fail CSV
-df_pantun = pd.read_csv(csv_filename)
+# ✅ Muatkan DataFrame pantun
+df_pantun = load_pantun()
 
-# ✅ Header utama aplikasi
-st.markdown("<h1 style='text-align: center;'>📜 Pantun Warga Emas</h1>", unsafe_allow_html=True)
+# ✅ Debug: Paparkan data CSV dalam bentuk tabel jika wujud
+if not df_pantun.empty:
+    st.write("📋 **Data Pantun (Debug Mode):**")
+    st.dataframe(df_pantun.head(5))  # Hanya paparkan 5 baris pertama untuk semakan
+else:
+    st.warning("⚠ Data pantun tidak berjaya dimuat. Sila semak semula fail CSV.")
 
-# ✅ Menu navigasi utama
-menu = st.radio(
-    "Pilih menu:",
-    ["App", "Carian Pantun", "Paparan Pantun", "Muat Turun Buku"],
-    horizontal=True
-)
+# ✅ Tajuk halaman
+st.markdown("<h1 style='text-align: center;'>📖 Paparan Pantun</h1>", unsafe_allow_html=True)
 
-st.markdown("---")
+# ✅ Jika CSV berjaya dimuatkan, papar pantun
+if not df_pantun.empty:
+    # 🟢 Ambil 1-3 pantun secara rawak jika tiada carian
+    random_pantun = df_pantun.sample(n=min(3, len(df_pantun)))
 
-# ✅ HALAMAN UTAMA (APP)
-if menu == "App":
-    st.subheader("✨ Selamat Datang ke Carian Pantun Warga Emas")
-    st.write("Aplikasi ini membolehkan anda mencari dan membaca pantun bernilai emas yang penuh nasihat dan hikmah.")
+    # ✅ Paparkan pantun dalam format yang tersusun
+    for index, row in random_pantun.iterrows():
+        st.markdown(f"""
+        <div style="border: 2px solid #EAEAEA; padding: 15px; border-radius: 10px; background-color: #FAFAFA; margin-bottom: 20px;">
+            <h3 style="color: #2E86C1;">📖 {row['Tema']}</h3>
+            <p style="font-style: italic; font-size: 18px; color: #555;">{row['Pantun'].replace("\\n", "<br>")}</p>
+            <p>🔖 <b>Jenis:</b> {row['Jenis']}</p>
+            <p>🎯 <b>Situasi Penggunaan:</b> {row['Situasi Penggunaan']}</p>
+            <p>💡 <b>Cara Penggunaan:</b> {row['Cara Penggunaan']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("""
-    **🎯 Apa yang boleh anda lakukan di sini?**
-    - 🔍 **Cari pantun** mengikut **tema, jenis, atau situasi penggunaan**
-    - 📖 **Baca pantun dengan format yang kemas**
-    - 📥 **Muat turun koleksi pantun dalam format PDF & DOCX**
-    """)
+else:
+    # Jika CSV kosong atau gagal dimuatkan
+    st.warning("⚠ Tiada pantun tersedia untuk dipaparkan.")
 
-# ✅ CARIAN PANTUN
-elif menu == "Carian Pantun":
-    st.subheader("🔍 Cari Pantun Warga Emas")
-
-    # 🔹 Pilihan profil pengguna
-    profil_pengguna = st.selectbox(
-        "👤 Pilih Profil Pengguna:",
-        ["Umum", "Guru", "Ibu Bapa", "Pakar Motivasi", "Hos Majlis"]
-    )
-
-    # 🔹 Pilihan kaedah carian
-    pilihan_carian = st.radio(
-        "Bagaimana anda mahu cari pantun?",
-        ["Tema", "Jenis", "Situasi Penggunaan", "Kata Kunci"],
-        horizontal=True
-    )
-
-    # 🔹 Dropdown berdasarkan kaedah carian
-    if pilihan_carian == "Tema":
-        pilihan = st.selectbox("📌 Pilih Tema:", ["Semua"] + sorted(df_pantun["Tema"].unique()))
-        filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Tema"] == pilihan]
-    elif pilihan_carian == "Jenis":
-        pilihan = st.selectbox("🏷 Pilih Jenis Pantun:", ["Semua"] + sorted(df_pantun["Jenis"].unique()))
-        filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Jenis"] == pilihan]
-    elif pilihan_carian == "Situasi Penggunaan":
-        pilihan = st.selectbox("🎯 Pilih Situasi Penggunaan:", ["Semua"] + sorted(df_pantun["Situasi Penggunaan"].unique()))
-        filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Situasi Penggunaan"] == pilihan]
-    else:  # Kata kunci
-        search_query = st.text_input("🔎 Masukkan kata kunci pantun:")
-        filtered_pantun = df_pantun[
-            df_pantun.apply(lambda row: search_query.lower() in row.astype(str).str.lower().to_string(), axis=1)
-        ] if search_query else df_pantun
-
-    # 🔹 Paparkan hasil carian
-    jumlah_pantun = len(filtered_pantun)
-    if jumlah_pantun > 0:
-        st.success(f"✅ {jumlah_pantun} pantun dijumpai:")
-        for index, row in filtered_pantun.iterrows():
-            with st.container():
-                pantun_rangkap = "<br>".join(row["Pantun"].split("\n"))  # Format rangkap pantun
-                
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color: #f9f9f9; 
-                        padding: 15px; 
-                        border-radius: 10px; 
-                        color: black; 
-                        font-size: 18px;
-                        font-family: Arial, sans-serif;">
-                    <h3 style="color: #2E3A87;">📖 {row['Tema']}</h3>
-                    <p style="font-size: 18px; font-style: italic; line-height: 1.6;">
-                    {pantun_rangkap}
-                    </p>
-                    <p><b>📌 Makna:</b> {row['Makna']}</p>
-                    <p><b>🏷 Jenis:</b> {row['Jenis']} | <b>🎯 Situasi Penggunaan:</b> {row['Situasi Penggunaan']}</p>
-                    <p><b>💡 Cara Penggunaan:</b> {row['Cara Penggunaan']}</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-                st.markdown("---")
-    else:
-        st.warning("❌ Tiada pantun ditemui berdasarkan pilihan anda.")
-
-# ✅ MUAT TURUN BUKU
-elif menu == "Muat Turun Buku":
-    st.subheader("📥 Muat Turun Buku Pantun Warga Emas")
-    st.write("Klik butang di bawah untuk memuat turun buku penuh dalam format PDF atau DOCX.")
-
-    pdf_path = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas_Final.pdf")
-    docx_path = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas_Final.docx")
-
-    if os.path.exists(pdf_path):
-        with open(pdf_path, "rb") as file_pdf:
-            st.download_button("📄 Muat Turun PDF", file_pdf, file_name="60_Pantun_Warga_Emas.pdf", mime="application/pdf")
-
-    if os.path.exists(docx_path):
-        with open(docx_path, "rb") as file_docx:
-            st.download_button("📜 Muat Turun DOCX", file_docx, file_name="60_Pantun_Warga_Emas.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-# ✅ FOOTER
-st.markdown("---")
-st.markdown(
-    """<p style='text-align: center; font-size: 14px;'>
-    © 2008-2025 Carian Pantun Warga Emas. v1. 2023-2025.  
-    Sebuah carian pantun berguna yang boleh digunakan dalam acara dan majlis.
-    </p>""",
-    unsafe_allow_html=True
-)
+# ✅ Footer
+st.markdown("""
+    <hr>
+    <p style="text-align: center; font-size: 14px;">
+    © 2008-2025 Carian Pantun Warga Emas. v1. 2023-2025. Sebuah carian pantun berguna yang boleh digunakan dalam acara dan majlis.
+    </p>
+    """, unsafe_allow_html=True)
