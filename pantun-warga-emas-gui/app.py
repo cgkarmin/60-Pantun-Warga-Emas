@@ -5,6 +5,19 @@ import os
 # ✅ Konfigurasi halaman utama tanpa sidebar
 st.set_page_config(page_title="Pantun Warga Emas", layout="wide")
 
+# ✅ CSS untuk sembunyikan sidebar sepenuhnya
+st.markdown(
+    """
+    <style>
+        /* Sembunyikan sidebar sepenuhnya */
+        section[data-testid="stSidebar"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # ✅ Path ke fail CSV & fail muat turun
 csv_path = "data/60_Pantun_Warga_Emas.csv"
 pdf_path = "data/60_Pantun_Warga_Emas_Final.pdf"
