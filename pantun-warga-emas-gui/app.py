@@ -5,22 +5,19 @@ import os
 # Tetapan halaman utama
 st.set_page_config(page_title="Pantun Warga Emas", layout="wide", initial_sidebar_state="collapsed")
 
-# 📌 Periksa dan Tetapkan Path Fail
+# 📌 Pastikan fail berada dalam folder yang betul
 data_folder = "data"
 csv_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas.csv")
 pdf_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas_Final.pdf")
 docx_filename = os.path.join(data_folder, "60_Pantun_Warga_Emas_Final.docx")
 
-# Periksa sama ada fail wujud
+# Periksa kewujudan fail
 pantun_loaded = os.path.exists(csv_filename)
 pdf_available = os.path.exists(pdf_filename)
 docx_available = os.path.exists(docx_filename)
 
-# Header utama
-st.markdown("<h1 style='text-align: center;'>📖 Pantun Warga Emas</h1>", unsafe_allow_html=True)
-
 # Menu utama
-menu = st.radio("📌 Pilih menu:", ["App", "Carian Pantun", "Muat Turun Buku", "Senarai Fail"], horizontal=True)
+menu = st.radio("📌 Pilih menu:", ["App", "Carian Pantun", "Muat Turun Buku"], horizontal=True)
 
 # 📌 1. Bahagian App (Maklumat Aplikasi)
 if menu == "App":
@@ -45,9 +42,10 @@ elif menu == "Carian Pantun":
         try:
             df_pantun = pd.read_csv(csv_filename)
 
-            # Pastikan kolum "Tema" wujud
-            if "Tema" not in df_pantun.columns:
-                st.error("🚨 Ralat: Fail CSV tidak mempunyai kolum 'Tema'. Sila semak format fail.")
+            # Pastikan kolum "Tema" wujud dalam CSV
+            required_columns = ["Tema", "Pantun", "Makna", "Situasi Penggunaan"]
+            if not all(col in df_pantun.columns for col in required_columns):
+                st.error("🚨 Ralat: Fail CSV tidak mempunyai kolum yang lengkap! Sila semak format fail.")
             else:
                 search_keyword = st.text_input("Masukkan kata kunci untuk mencari pantun:")
 
@@ -89,21 +87,6 @@ elif menu == "Muat Turun Buku":
             st.download_button(label="📝 Muat Turun DOCX", data=file_docx, file_name="Pantun_Warga_Emas.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     else:
         st.error("❌ Fail DOCX tidak ditemui. Pastikan fail berada dalam folder `data/`.")
-
-# 📌 4. Bahagian Senarai Fail - **Untuk Debugging**
-elif menu == "Senarai Fail":
-    st.subheader("📂 Senarai Fail dalam Aplikasi")
-
-    # Paparkan semua fail yang ada dalam direktori utama
-    files = os.listdir()
-    st.write("📂 Fail dalam root:", files)
-
-    # Paparkan semua fail dalam folder "data"
-    if os.path.exists(data_folder):
-        data_files = os.listdir(data_folder)
-        st.write("📂 Fail dalam folder 'data':", data_files)
-    else:
-        st.error("🚨 Folder 'data' tidak wujud!")
 
 # Footer
 st.markdown("<hr>", unsafe_allow_html=True)
