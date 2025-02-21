@@ -1,34 +1,29 @@
+import os
 import streamlit as st
 import pandas as pd
-import os
 
-# **Matikan menu automatik dari Streamlit & buang sidebar**
+# ✅ Konfigurasi halaman Streamlit
 st.set_page_config(
     page_title="Pantun Warga Emas",
     layout="wide",
-    initial_sidebar_state="collapsed",
-    menu_items={"Get Help": None, "Report a bug": None, "About": None}
+    initial_sidebar_state="collapsed"
 )
 
-# **Mencari fail CSV di lokasi yang betul**
-csv_paths = ["data/60_Pantun_Warga_Emas.csv", "60_Pantun_Warga_Emas.csv"]
-csv_filename = None
+# ✅ Pastikan fail CSV boleh dibaca di laptop & Streamlit Cloud
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+csv_filename = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas.csv")
 
-for path in csv_paths:
-    if os.path.exists(path):
-        csv_filename = path
-        break
-
-if csv_filename is None:
-    st.error("❌ Fail CSV tidak ditemui! Pastikan ia berada dalam folder projek (`data/` atau direktori utama).")
+if not os.path.exists(csv_filename):
+    st.error(f"❌ Fail CSV tidak ditemui! Pastikan ia berada dalam folder `data/`. Path: {csv_filename}")
     st.stop()
 
-# **Muatkan data CSV**
+# ✅ Baca fail CSV
 df_pantun = pd.read_csv(csv_filename)
 
-# **MENU UTAMA**
+# ✅ Header utama aplikasi
 st.markdown("<h1 style='text-align: center;'>📜 Pantun Warga Emas</h1>", unsafe_allow_html=True)
 
+# ✅ Menu navigasi utama
 menu = st.radio(
     "Pilih menu:",
     ["App", "Carian Pantun", "Paparan Pantun", "Muat Turun Buku"],
@@ -37,34 +32,36 @@ menu = st.radio(
 
 st.markdown("---")
 
-# **HALAMAN UTAMA (APP)**
+# ✅ HALAMAN UTAMA (APP)
 if menu == "App":
     st.subheader("✨ Selamat Datang ke Carian Pantun Warga Emas")
-    st.write("Sebuah koleksi pantun yang penuh dengan hikmah, nasihat, dan inspirasi untuk semua golongan masyarakat.")
+    st.write("Aplikasi ini membolehkan anda mencari dan membaca pantun bernilai emas yang penuh nasihat dan hikmah.")
 
-    st.markdown(
-        """
-        🏆 **Apa yang boleh anda lakukan di sini?**  
-        ✅ Cari pantun mengikut tema, jenis, atau situasi penggunaan  
-        ✅ Dapatkan inspirasi dan nasihat melalui rangkap-rangkap pantun  
-        ✅ Muat turun koleksi pantun dalam format PDF & DOCX  
-        """
-    )
+    st.markdown("""
+    **🎯 Apa yang boleh anda lakukan di sini?**
+    - 🔍 **Cari pantun** mengikut **tema, jenis, atau situasi penggunaan**
+    - 📖 **Baca pantun dengan format yang kemas**
+    - 📥 **Muat turun koleksi pantun dalam format PDF & DOCX**
+    """)
 
-# **CARIAN PANTUN**
+# ✅ CARIAN PANTUN
 elif menu == "Carian Pantun":
     st.subheader("🔍 Cari Pantun Warga Emas")
 
-    # **Dropdown pilihan profil pengguna**
+    # 🔹 Pilihan profil pengguna
     profil_pengguna = st.selectbox(
         "👤 Pilih Profil Pengguna:",
         ["Umum", "Guru", "Ibu Bapa", "Pakar Motivasi", "Hos Majlis"]
     )
 
-    # **Pengguna boleh pilih satu cara carian sahaja**
-    pilihan_carian = st.radio("Bagaimana anda mahu cari pantun?", ["Tema", "Jenis", "Situasi Penggunaan", "Kata Kunci"], horizontal=True)
+    # 🔹 Pilihan kaedah carian
+    pilihan_carian = st.radio(
+        "Bagaimana anda mahu cari pantun?",
+        ["Tema", "Jenis", "Situasi Penggunaan", "Kata Kunci"],
+        horizontal=True
+    )
 
-    # **Dropdown pilihan berdasarkan pilihan pengguna**
+    # 🔹 Dropdown berdasarkan kaedah carian
     if pilihan_carian == "Tema":
         pilihan = st.selectbox("📌 Pilih Tema:", ["Semua"] + sorted(df_pantun["Tema"].unique()))
         filtered_pantun = df_pantun if pilihan == "Semua" else df_pantun[df_pantun["Tema"] == pilihan]
@@ -80,7 +77,7 @@ elif menu == "Carian Pantun":
             df_pantun.apply(lambda row: search_query.lower() in row.astype(str).str.lower().to_string(), axis=1)
         ] if search_query else df_pantun
 
-    # **Paparkan Hasil Carian**
+    # 🔹 Paparkan hasil carian
     jumlah_pantun = len(filtered_pantun)
     if jumlah_pantun > 0:
         st.success(f"✅ {jumlah_pantun} pantun dijumpai:")
@@ -106,13 +103,13 @@ elif menu == "Carian Pantun":
     else:
         st.warning("❌ Tiada pantun ditemui berdasarkan pilihan anda.")
 
-# **MUAT TURUN BUKU**
+# ✅ MUAT TURUN BUKU
 elif menu == "Muat Turun Buku":
     st.subheader("📥 Muat Turun Buku Pantun Warga Emas")
     st.write("Klik butang di bawah untuk memuat turun buku penuh dalam format PDF atau DOCX.")
 
-    pdf_path = "data/60_Pantun_Warga_Emas_Final.pdf"
-    docx_path = "data/60_Pantun_Warga_Emas_Final.docx"
+    pdf_path = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas_Final.pdf")
+    docx_path = os.path.join(BASE_DIR, "data", "60_Pantun_Warga_Emas_Final.docx")
 
     if os.path.exists(pdf_path):
         with open(pdf_path, "rb") as file_pdf:
@@ -122,7 +119,7 @@ elif menu == "Muat Turun Buku":
         with open(docx_path, "rb") as file_docx:
             st.download_button("📜 Muat Turun DOCX", file_docx, file_name="60_Pantun_Warga_Emas.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-# **FOOTER - Dipaparkan di semua halaman**
+# ✅ FOOTER
 st.markdown("---")
 st.markdown(
     """<p style='text-align: center; font-size: 14px;'>
