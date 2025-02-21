@@ -87,9 +87,15 @@ elif menu == "Carian Pantun":
                 
                 st.markdown(
                     f"""
-                    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 10px;">
-                    <h3>📖 {row['Tema']}</h3>
-                    <p style='font-size: 18px; font-style: italic;'>
+                    <div style="
+                        background-color: #f9f9f9; 
+                        padding: 15px; 
+                        border-radius: 10px; 
+                        color: black; 
+                        font-size: 18px;
+                        font-family: Arial, sans-serif;">
+                    <h3 style="color: #2E3A87;">📖 {row['Tema']}</h3>
+                    <p style="font-size: 18px; font-style: italic; line-height: 1.6;">
                     {pantun_rangkap}
                     </p>
                     <p><b>📌 Makna:</b> {row['Makna']}</p>
